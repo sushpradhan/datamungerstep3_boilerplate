@@ -1,16 +1,25 @@
 package com.stackroute.datamunger.reader;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import com.stackroute.datamunger.query.DataTypeDefinitions;
 import com.stackroute.datamunger.query.Header;
 
 public class CsvQueryProcessor extends QueryProcessingEngine {
-
+     File data;
+     BufferedReader br;
 	// Parameterized constructor to initialize filename
 	public CsvQueryProcessor(String fileName) throws FileNotFoundException {
-
+		data =new File("data/ipl.csv");
+		FileReader fr=new FileReader(data);
+		br=new BufferedReader(fr);
+		
+		
 	}
 
 	/*
@@ -20,12 +29,18 @@ public class CsvQueryProcessor extends QueryProcessingEngine {
 	 */
 	
 	@Override
-	public Header getHeader() throws IOException {
-
+	public Header getHeader() throws IOException, FileNotFoundException{
+		
+		Header hd=new Header();
+		String query=br.readLine();
+		{
+		String[] res=query.trim().split(",");
+		hd.setHeaders(res);
+		return hd;
+		}
 		// read the first line
 
 		// populate the header object with the String array containing the header names
-		return null;
 	}
 
 	/**
@@ -49,7 +64,35 @@ public class CsvQueryProcessor extends QueryProcessingEngine {
 	
 	@Override
 	public DataTypeDefinitions getColumnType() throws IOException {
+		
+		DataTypeDefinitions dt=new DataTypeDefinitions();
+		
+		String col=br.readLine();
+		String[] out2=col.split(",");
+		String res = "";
+		for(int i=0;i<out2.length;i++)
+		{
+			try
+			{
+			Integer.parseInt(out2[i]);
+			res=res.concat("java.lang.Integer ");
+			}
+			catch(Exception e)
+			{
+				try
+				{
+					Double.parseDouble(out2[i]);
+					res=res.concat("java.lang.Double ");
+				}
+				catch(Exception f)
+				{
+					res=res.concat("java.lang.String ");
+				}
+			}
+		}
+		dt.setDataTypes(res.split(" "));
 
-		return null;
+		return dt;
 	}
+
 }
